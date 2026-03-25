@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# env
+.env
+.env.*
+
+# Node
+node_modules/
+dist/
+build/
+
+# Foundry
+cache/
+out/
+
+# Hardhat
+artifacts/
+cache_hardhat/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+EOF && git add . && git commit --trailer "Made-with: Cursor" -m 'chore: initialize DeFi lending project scaffold' && git branch -M main && (git remote remove origin || true) && git remote add origin "https://github.com/atouyang2084-stack/Defi-Lending-Brorrowing.git" && git push -u origin main
