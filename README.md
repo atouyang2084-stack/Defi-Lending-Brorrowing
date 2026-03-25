@@ -1,6 +1,6 @@
 # Decentralized Lending & Borrowing Protocol
 
-一个用于大学课程项目的去中心化借贷协议模板，支持 ERC-20 资产（如 USDC/WBTC）的存取款、借还款，并包含超额抵押、LTV、Health Factor、Kinked 利率模型、清算与 Flash Loan 的扩展能力。
+去中心化借贷协议，支持 ERC-20 资产（如 USDC/WBTC）的存取款、借还款，并包含超额抵押、LTV、Health Factor、Kinked 利率模型、清算与 Flash Loan 的扩展能力。
 
 ## 1. 项目目标
 
@@ -9,7 +9,7 @@
 - 利率模型：`Kinked Model`，按区块通过 `Index` 累加
 - 预言机：集成 Chainlink
 - 加分能力：第三方清算（`HF < 1`）与 Flash Loan 接口
-- 代码结构：模块化、可扩展，方便 4 人协作开发
+- 代码结构：模块化、可扩展
 
 ## 2. 技术栈
 
@@ -139,7 +139,7 @@
 
 ---
 
-如果你愿意，下一步我可以继续在该目录中直接生成：
+下一步：
 
 - `contracts/src/interfaces/ILendingPool.sol`（完整接口）
 - `contracts/src/libraries/InterestLogic.sol`（含 Kinked + Index 公式骨架）
