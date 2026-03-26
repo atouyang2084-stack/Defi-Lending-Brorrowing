@@ -114,5 +114,39 @@ describe("LendingPool 核心功能与清算测试", function () {
     const wbtcBalanceAfter = await wbtc.balanceOf(user3.address);
     expect(wbtcBalanceAfter.gt(wbtcBalanceBefore)).to.be.true;
     console.log(`✅ 清算成功！清算人获利抵押品数量: ${ethers.utils.formatUnits(wbtcBalanceAfter.sub(wbtcBalanceBefore), 8)} WBTC`);
+
+  });
+      it("4. 应该允许用户成功执行闪电贷 (Flash Loan) 并支付手续费", async function () {
+    // 1. 先给池子注入 100,000 USDC 的流动性，不然没钱可借
+    await usdc.connect(user1).approve(pool.address, ethers.utils.parseUnits("100000", 6));
+    await pool.connect(user1).deposit({ asset: usdc.address, amount: ethers.utils.parseUnits("100000", 6), onBehalfOf: ethers.constants.AddressZero });
+
+    // 2. 部署我们刚才写的那个“借款人”合约
+    const MockFlashLoanReceiver = await ethers.getContractFactory("MockFlashLoanReceiver");
+    const receiver = await MockFlashLoanReceiver.deploy(pool.address);
+
+    // 3. 重点：借款人还钱时需要多还 0.09% 的手续费。
+    // 我们打算闪电贷借 10,000 USDC，手续费就是 9 USDC。
+    // 所以我们提前给接收合约发 10 个 USDC 当本钱，防止它没钱付手续费被回滚。
+    const flashAmount = ethers.utils.parseUnits("10000", 6);
+    await usdc.mint(receiver.address, ethers.utils.parseUnits("10", 6));
+
+    // 4. 记录闪电贷执行前，池子赚取的协议收入 (Protocol Reserves)
+    const reserveDataBefore = await pool.getReserveData(usdc.address);
+
+    // 5. 见证奇迹的时刻：发起闪电贷！
+    await pool.connect(user1).flashLoan({
+      receiver: receiver.address,
+      asset: usdc.address,
+      amount: flashAmount,
+      data: "0x" // 我们不需要传额外数据
+    });
+
+    // 6. 验证结果：池子的协议收入应该增加了 9 个 USDC
+    const reserveDataAfter = await pool.getReserveData(usdc.address);
+    const feeEarned = reserveDataAfter.protocolReserves.sub(reserveDataBefore.protocolReserves);
+    
+    expect(feeEarned.toString()).to.equal(ethers.utils.parseUnits("9", 6).toString());
+    console.log(`✅ 闪电贷执行成功！池子白赚了手续费: ${ethers.utils.formatUnits(feeEarned, 6)} USDC`);
   });
 });
