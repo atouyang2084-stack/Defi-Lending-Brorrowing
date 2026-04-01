@@ -25,3 +25,14 @@ cache_hardhat/
 .vscode/
 .idea/
 EOF && git add . && git commit --trailer "Made-with: Cursor" -m 'chore: initialize DeFi lending project scaffold' && git branch -M main && (git remote remove origin || true) && git remote add origin "https://github.com/atouyang2084-stack/Defi-Lending-Brorrowing.git" && git push -u origin main
+node_modules
+.env
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Hardhat files
+cache
+artifacts
+contracts/contract-addresses.json
