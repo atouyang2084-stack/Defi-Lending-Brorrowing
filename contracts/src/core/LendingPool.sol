@@ -88,7 +88,17 @@ contract LendingPool is ILendingPool {
 
         ReserveData storage r = _reserveData[p.asset];
         address user = p.onBehalfOf == address(0) ? msg.sender : p.onBehalfOf;
+        
+        // 计算并检查是否会导致溢出
         uint256 scaled = (p.amount * RAY) / r.supplyIndex;
+        if (scaled == 0) revert InvalidAmount(); // 防止精度损失
+        if (userSupplyScaled[user][p.asset] > type(uint256).max - scaled) {
+            revert InsufficientLiquidity(); // 用户存款会导致溢出
+        }
+        if (r.totalSupplyScaled > type(uint256).max - scaled) {
+            revert InsufficientLiquidity(); // 总存款会导致溢出
+        }
+        
         userSupplyScaled[user][p.asset] += scaled;
         r.totalSupplyScaled += scaled;
         _touchUserAsset(user, p.asset);
@@ -106,10 +116,19 @@ contract LendingPool is ILendingPool {
         uint256 scaledToBurn = (p.amount * RAY) / r.supplyIndex;
         if (scaledToBurn > userSupplyScaled[msg.sender][p.asset]) revert InsufficientLiquidity();
 
+        // 先扣除抵押品，再检查健康因子
         userSupplyScaled[msg.sender][p.asset] -= scaledToBurn;
         r.totalSupplyScaled -= scaledToBurn;
 
-        if (healthFactor(msg.sender) < RAY) revert HealthFactorTooLow(healthFactor(msg.sender));
+        // 检查提款后的健康因子
+        uint256 hf = healthFactor(msg.sender);
+        if (hf < RAY) {
+            // 如果健康因子低于 1，恢复抵押品并回滚
+            userSupplyScaled[msg.sender][p.asset] += scaledToBurn;
+            r.totalSupplyScaled += scaledToBurn;
+            revert HealthFactorTooLow(hf);
+        }
+        
         _safeTransfer(p.asset, p.to, p.amount);
         emit Withdrawn(msg.sender, p.asset, p.amount, p.to);
     }
@@ -124,7 +143,17 @@ contract LendingPool is ILendingPool {
         if (p.amount > available) revert InsufficientLiquidity();
 
         address user = p.onBehalfOf == address(0) ? msg.sender : p.onBehalfOf;
+        
+        // 检查借款金额是否会导致溢出
         uint256 scaled = (p.amount * RAY) / r.borrowIndex;
+        if (scaled == 0) revert InvalidAmount(); // 防止精度损失导致借款失败
+        if (userBorrowScaled[user][p.asset] > type(uint256).max - scaled) {
+            revert InsufficientLiquidity(); // 借款会导致溢出
+        }
+        if (r.totalBorrowScaled > type(uint256).max - scaled) {
+            revert InsufficientLiquidity(); // 总借款会导致溢出
+        }
+        
         userBorrowScaled[user][p.asset] += scaled;
         r.totalBorrowScaled += scaled;
         _touchUserAsset(user, p.asset);
@@ -144,9 +173,22 @@ contract LendingPool is ILendingPool {
         if (debt == 0) return 0;
 
         repaidAmount = p.amount > debt ? debt : p.amount;
+        if (repaidAmount == 0) return 0;
+        
         ReserveData storage r = _reserveData[p.asset];
         uint256 scaledToBurn = (repaidAmount * RAY) / r.borrowIndex;
-        if (scaledToBurn > userBorrowScaled[user][p.asset]) scaledToBurn = userBorrowScaled[user][p.asset];
+        
+        // 确保不会燃烧超过用户拥有的金额
+        if (scaledToBurn > userBorrowScaled[user][p.asset]) {
+            scaledToBurn = userBorrowScaled[user][p.asset];
+        }
+        
+        // 确保不会燃烧超过总借款的金额
+        if (scaledToBurn > r.totalBorrowScaled) {
+            scaledToBurn = r.totalBorrowScaled;
+        }
+        
+        if (scaledToBurn == 0) return 0;
 
         userBorrowScaled[user][p.asset] -= scaledToBurn;
         r.totalBorrowScaled -= scaledToBurn;
@@ -163,7 +205,11 @@ contract LendingPool is ILendingPool {
         uint256 minSeizeAmount
     ) external override nonReentrant returns (uint256 seizedAmount) {
         if (repayAmount == 0) revert InvalidAmount();
-        if (healthFactor(borrower) >= RAY) revert NotLiquidatable();
+        if (borrower == address(0)) revert InvalidAmount();
+        if (debtAsset == address(0) || collateralAsset == address(0)) revert AssetNotSupported(address(0));
+        
+        uint256 hf = healthFactor(borrower);
+        if (hf >= RAY) revert NotLiquidatable();
 
         _requireActiveAsset(debtAsset);
         _requireActiveAsset(collateralAsset);
@@ -171,20 +217,26 @@ contract LendingPool is ILendingPool {
         if (collateralAsset != debtAsset) accrueInterest(collateralAsset);
 
         uint256 borrowerDebt = userBorrowBalance(borrower, debtAsset);
+        if (borrowerDebt == 0) revert NotLiquidatable();
         uint256 actualRepay = repayAmount > borrowerDebt ? borrowerDebt : repayAmount;
+        if (actualRepay == 0) revert InvalidAmount();
 
         AssetConfig memory debtCfg = _assetConfig[debtAsset];
         AssetConfig memory colCfg = _assetConfig[collateralAsset];
         uint256 debtPrice = ChainlinkOracleAdapter.getPriceWad(debtCfg.priceFeed, ORACLE_MAX_STALE_SECONDS);
         uint256 colPrice = ChainlinkOracleAdapter.getPriceWad(colCfg.priceFeed, ORACLE_MAX_STALE_SECONDS);
+        
+        if (debtPrice == 0 || colPrice == 0) revert OraclePriceInvalid();
 
         uint256 repayUsd = RiskEngine.tokenToUsdWad(actualRepay, debtCfg.decimals, debtPrice);
         uint256 seizeUsd = (repayUsd * (BPS + colCfg.liquidationBonusBps)) / BPS;
         seizedAmount = RiskEngine.usdWadToToken(seizeUsd, colCfg.decimals, colPrice);
         if (seizedAmount < minSeizeAmount) revert InsufficientLiquidity();
+        if (seizedAmount == 0) revert InsufficientLiquidity();
 
         uint256 borrowerCollateral = userSupplyBalance(borrower, collateralAsset);
         if (seizedAmount > borrowerCollateral) seizedAmount = borrowerCollateral;
+        if (seizedAmount == 0) revert InsufficientLiquidity();
 
         // Repay debt
         ReserveData storage debtR = _reserveData[debtAsset];
@@ -192,6 +244,7 @@ contract LendingPool is ILendingPool {
         if (burnDebtScaled > userBorrowScaled[borrower][debtAsset]) {
             burnDebtScaled = userBorrowScaled[borrower][debtAsset];
         }
+        if (burnDebtScaled == 0) revert InsufficientLiquidity();
         userBorrowScaled[borrower][debtAsset] -= burnDebtScaled;
         debtR.totalBorrowScaled -= burnDebtScaled;
         _safeTransferFrom(debtAsset, msg.sender, address(this), actualRepay);
@@ -202,6 +255,7 @@ contract LendingPool is ILendingPool {
         if (burnSupplyScaled > userSupplyScaled[borrower][collateralAsset]) {
             burnSupplyScaled = userSupplyScaled[borrower][collateralAsset];
         }
+        if (burnSupplyScaled == 0) revert InsufficientLiquidity();
         userSupplyScaled[borrower][collateralAsset] -= burnSupplyScaled;
         colR.totalSupplyScaled -= burnSupplyScaled;
         _safeTransfer(collateralAsset, msg.sender, seizedAmount);
@@ -210,12 +264,25 @@ contract LendingPool is ILendingPool {
     }
 
     function flashLoan(FlashLoanParams calldata p) external override nonReentrant {
+        if (p.amount == 0) revert InvalidAmount();
+        if (p.receiver == address(0)) revert InvalidAmount();
         _requireActiveAsset(p.asset);
         accrueInterest(p.asset);
 
         ReserveData storage r = _reserveData[p.asset];
-        uint256 fee = (p.amount * FLASH_FEE_BPS) / BPS;
         uint256 balanceBefore = IERC20Minimal(p.asset).balanceOf(address(this));
+        
+        // 检查池子是否有足够的流动性
+        if (balanceBefore < p.amount) revert InsufficientLiquidity();
+        
+        uint256 fee = (p.amount * FLASH_FEE_BPS) / BPS;
+        uint256 totalToRepay = p.amount + fee;
+        
+        // 检查费用是否会导致溢出
+        if (totalToRepay < p.amount) revert InvalidAmount();
+        if (r.protocolReserves > type(uint256).max - fee) {
+            revert InsufficientLiquidity(); // 协议储备会溢出
+        }
 
         _safeTransfer(p.asset, p.receiver, p.amount);
         bytes32 ret = IFlashLoanReceiver(p.receiver).onFlashLoan(msg.sender, p.asset, p.amount, fee, p.data);
@@ -241,8 +308,17 @@ contract LendingPool is ILendingPool {
         uint256 delta = block.number - r.lastUpdatedBlock;
         if (delta == 0) return;
 
+        // 防止过大的 delta 导致计算溢出
+        if (delta > 1000000) {
+            // 如果 delta 过大（例如超过 100 万个区块），限制为 100 万
+            delta = 1000000;
+        }
+
         uint256 totalBorrows = (r.totalBorrowScaled * r.borrowIndex) / RAY;
         uint256 totalSupplies = (r.totalSupplyScaled * r.supplyIndex) / RAY;
+
+        // 防止除零错误
+        if (totalSupplies == 0) totalSupplies = 1;
 
         InterestLogic.ReserveAccrualState memory s = InterestLogic.ReserveAccrualState({
             totalBorrowsUnderlying: totalBorrows,
@@ -255,6 +331,15 @@ contract LendingPool is ILendingPool {
         });
 
         InterestLogic.AccrualResult memory out = InterestLogic.accrue(s, _kinkParams[asset]);
+        
+        // 确保索引不会减少
+        if (out.newBorrowIndex < r.borrowIndex) {
+            out.newBorrowIndex = r.borrowIndex;
+        }
+        if (out.newSupplyIndex < r.supplyIndex) {
+            out.newSupplyIndex = r.supplyIndex;
+        }
+        
         r.borrowIndex = out.newBorrowIndex;
         r.supplyIndex = out.newSupplyIndex;
         r.protocolReserves = out.newProtocolReserves;
@@ -335,15 +420,30 @@ contract LendingPool is ILendingPool {
             if (!c.isActive) continue;
 
             uint256 priceWad = ChainlinkOracleAdapter.getPriceWad(c.priceFeed, ORACLE_MAX_STALE_SECONDS);
+            if (priceWad == 0) continue; // 跳过价格为 0 的资产
 
             uint256 supplyAmt = userSupplyBalance(user, asset);
             uint256 debtAmt = userBorrowBalance(user, asset);
             uint256 supplyUsd = RiskEngine.tokenToUsdWad(supplyAmt, c.decimals, priceWad);
             uint256 debtUsd = RiskEngine.tokenToUsdWad(debtAmt, c.decimals, priceWad);
+            
+            // 防止溢出检查
+            if (collateralValueUsdWad > type(uint256).max - supplyUsd) {
+                supplyUsd = type(uint256).max - collateralValueUsdWad;
+            }
+            if (debtValueUsdWad > type(uint256).max - debtUsd) {
+                debtUsd = type(uint256).max - debtValueUsdWad;
+            }
 
             collateralValueUsdWad += supplyUsd;
             debtValueUsdWad += debtUsd;
-            weightedCollateralForHFUsdWad += (supplyUsd * c.liquidationThresholdBps) / BPS;
+            
+            // 防止加权抵押品溢出
+            uint256 weighted = (supplyUsd * c.liquidationThresholdBps) / BPS;
+            if (weightedCollateralForHFUsdWad > type(uint256).max - weighted) {
+                weighted = type(uint256).max - weightedCollateralForHFUsdWad;
+            }
+            weightedCollateralForHFUsdWad += weighted;
         }
 
         currentHealthFactorRay = RiskEngine.healthFactorRay(

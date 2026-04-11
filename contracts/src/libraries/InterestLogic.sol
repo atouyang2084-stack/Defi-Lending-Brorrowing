@@ -99,8 +99,16 @@ library InterestLogic {
 
         // simple per-block linear accrual for project scope
         // newIndex = oldIndex * (1 + rate * dt)
-        uint256 borrowGrowthRay = RAY + (r.borrowRatePerBlockRay * s.deltaBlocks);
-        uint256 supplyGrowthRay = RAY + (r.supplyRatePerBlockRay * s.deltaBlocks);
+        // 添加溢出保护：确保增长率不超过 RAY
+        uint256 borrowGrowth = r.borrowRatePerBlockRay * s.deltaBlocks;
+        uint256 supplyGrowth = r.supplyRatePerBlockRay * s.deltaBlocks;
+        
+        // 限制增长率，防止溢出
+        if (borrowGrowth > RAY) borrowGrowth = RAY;
+        if (supplyGrowth > RAY) supplyGrowth = RAY;
+        
+        uint256 borrowGrowthRay = RAY + borrowGrowth;
+        uint256 supplyGrowthRay = RAY + supplyGrowth;
 
         r.newBorrowIndex = (s.borrowIndex * borrowGrowthRay) / RAY;
         r.newSupplyIndex = (s.supplyIndex * supplyGrowthRay) / RAY;
