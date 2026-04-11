@@ -19,7 +19,7 @@ npx hardhat compile
 **USDC ABI 地址**: `artifacts/contracts/test/mocks/MockERC20.sol/MockERC20.json`
 
 ## 3. 本地部署与地址获取
-
+部署脚本在 contracts/script/deploy.js
 请按顺序执行以下两步：
 
 1. **启动本地链** (需保持窗口开启):
@@ -28,7 +28,7 @@ npx hardhat compile
 
 ​    2.**执行部署脚本**:
 
-   npx hardhat run scripts/deploy.js --network localhost
+npx hardhat run contracts/script/deploy.js --network localhost
 
 部署完成后，所有合约的最新地址将自动保存至：`contracts/contract-addresses.json`
 
