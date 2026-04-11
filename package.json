@@ -7,8 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-
+    "startnode": "npx hardhat node",
+    "startnetwork":"npx hardhat run contracts/script/deploy.js --network localhost",
+    "compile": "npx hardhat compile",
+    "transmit": "node scripts/copy-abi.js"
   },
   "repository": {
     "type": "git",

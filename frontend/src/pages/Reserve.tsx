@@ -1,9 +1,10 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { useParams } from 'react-router-dom';
-import { useAccountData, useAssetConfig, useAssetRates, useDeposit, useAllowance } from '../hooks';
+import { useAccountData, useAssetConfig, useAssetRates, useDeposit, useWithdraw, useBorrow, useRepay, useAllowance } from '../hooks';
 import { ADDRESSES } from '../web3/addresses';
 import erc20ABI from '../web3/abis/ERC20.json';
+import lendingPoolABI from '../web3/abis/LendingPool.json';
 import { formatAmount, formatPercentage, formatAPY } from '../utils/format';
 import AmountInput from '../components/AmountInput';
 import TxButton from '../components/TxButton';
@@ -20,7 +21,11 @@ export default function Reserve() {
     const { data: config } = useAssetConfig(ADDRESSES[asset?.toUpperCase() as keyof typeof ADDRESSES] as `0x${string}`);
     const rates = useAssetRates(ADDRESSES[asset?.toUpperCase() as keyof typeof ADDRESSES] as `0x${string}`);
     const deposit = useDeposit();
+    const withdraw = useWithdraw();
+    const borrow = useBorrow();
+    const repay = useRepay();
     const allowance = useAllowance(ADDRESSES[asset?.toUpperCase() as keyof typeof ADDRESSES] as `0x${string}`);
+    const repayAllowance = useAllowance(ADDRESSES[asset?.toUpperCase() as keyof typeof ADDRESSES] as `0x${string}`);
 
     // 获取用户余额
     const { data: balance } = useReadContract({
@@ -36,7 +41,7 @@ export default function Reserve() {
     // 获取用户存款余额
     const { data: suppliedBalance } = useReadContract({
         address: ADDRESSES.LENDING_POOL,
-        abi: require('../web3/abis/LendingPool.json'),
+        abi: lendingPoolABI,
         functionName: 'userSupplyBalance',
         args: [address as `0x${string}`, ADDRESSES[asset?.toUpperCase() as keyof typeof ADDRESSES] as `0x${string}`],
         query: {
@@ -47,7 +52,7 @@ export default function Reserve() {
     // 获取用户借款余额
     const { data: borrowedBalance } = useReadContract({
         address: ADDRESSES.LENDING_POOL,
-        abi: require('../web3/abis/LendingPool.json'),
+        abi: lendingPoolABI,
         functionName: 'userBorrowBalance',
         args: [address as `0x${string}`, ADDRESSES[asset?.toUpperCase() as keyof typeof ADDRESSES] as `0x${string}`],
         query: {
@@ -90,7 +95,31 @@ export default function Reserve() {
                     });
                 }
                 break;
-            // 其他操作待实现
+            case 'withdraw':
+                withdraw.withdraw({
+                    asset: config.asset,
+                    amount: amountBigInt,
+                    to: address,
+                });
+                break;
+            case 'borrow':
+                borrow.borrow({
+                    asset: config.asset,
+                    amount: amountBigInt,
+                    onBehalfOf: address,
+                });
+                break;
+            case 'repay':
+                if (repayAllowance.allowance && repayAllowance.allowance < amountBigInt) {
+                    repayAllowance.approve(amountBigInt);
+                } else {
+                    repay.repay({
+                        asset: config.asset,
+                        amount: amountBigInt,
+                        onBehalfOf: address,
+                    });
+                }
+                break;
             default:
                 break;
         }
