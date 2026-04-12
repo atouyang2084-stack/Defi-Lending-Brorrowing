@@ -58,7 +58,6 @@ frontend/public/test.html
 !contracts/test/mocks/     # 保留mock合约
 !contracts/test/LendingPool.test.js  # 保留主测试文件
 !scripts/copy-abi.js       # 保留ABI复制脚本
-!scripts/faucet.js         # 保留水龙头脚本
 !scripts/mint-to-any-account.js  # 保留发币脚本
 !scripts/check-contracts.js # 保留合约检查脚本
 

@@ -4,7 +4,6 @@ import { ADDRESSES } from '../web3/addresses';
 import { formatAmount, formatPercentage, formatAPY } from '../utils/format';
 import HealthFactorBadge from '../components/HealthFactorBadge';
 import ConnectButton from '../components/ConnectButton';
-import Faucet from '../components/Faucet';
 
 export default function Dashboard() {
     const { address, isConnected } = useAccount();
@@ -37,8 +36,6 @@ export default function Dashboard() {
                 <ConnectButton />
             </div>
 
-            {/* 水龙头 - 获取测试代币 */}
-            <Faucet />
 
             {/* 调试信息 */}
             {error && (

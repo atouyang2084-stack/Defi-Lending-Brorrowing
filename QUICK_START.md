@@ -29,50 +29,14 @@ npm run dev
 
 前端将在 http://localhost:5173 启动
 
-## 第四步：获取测试代币
-
-### 方法A：使用npm命令（最简单）
-```bash
-# 在项目根目录运行
-npm run faucet
-# 或
-npm run get-tokens
-```
-
-然后按照提示输入你的钱包地址。
-
-### 方法B：使用环境变量
-```bash
-# 设置你的钱包地址
-export TARGET_ADDRESS=0x你的钱包地址
-
-# 运行水龙头脚本
-npm run faucet
-```
-
-### 方法C：直接运行脚本
-```bash
-# 交互式
-node scripts/faucet.js
-
-# 非交互式（使用环境变量）
-TARGET_ADDRESS=0x你的钱包地址 node scripts/faucet.js
-```
 
 ## 第五步：连接钱包并开始测试
 
 1. 打开浏览器访问 http://localhost:5173
 2. 点击"Connect Wallet"连接钱包
 3. 确保网络是"Localhost 8545" (chainId: 31337)
-4. 在Dashboard页面可以看到"获取测试代币"卡片
 5. 开始测试存款、借款、还款功能
 
-## 获取的代币
-
-每个账户可以获得：
-- **10 ETH** - Gas费用
-- **100,000 USDC** - 稳定币
-- **1 WBTC** - 波动性资产
 
 ## 测试流程示例
 

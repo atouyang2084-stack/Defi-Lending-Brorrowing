@@ -7,7 +7,6 @@
 4. [部署智能合约](#部署智能合约)
 5. [启动前端应用](#启动前端应用)
 6. [配置钱包](#配置钱包)
-7. [获取测试代币](#获取测试代币)
 8. [使用协议功能](#使用协议功能)
 9. [故障排除](#故障排除)
 10. [项目结构](#项目结构)
@@ -184,36 +183,6 @@ Chain ID: 31337
 
 ---
 
-## 7. 💰 获取测试代币
-
-### 7.1 自动获取（前20个账户）
-
-如果你使用Hardhat节点的前20个账户之一，部署时已经自动获得了：
-- **100,000 USDC** (稳定币)
-- **1 WBTC** (波动性资产)
-- **10 ETH** (用于支付Gas费)
-
-### 7.2 手动获取（其他账户）
-
-```bash
-# 在项目根目录运行（新终端）
-TARGET_ADDRESS=你的钱包地址 npx hardhat run scripts/mint-to-any-account.js --network localhost
-```
-
-**示例**：
-```bash
-TARGET_ADDRESS=0x742d35Cc6634C0532925a3b844Bc9e90F1b6c1a3 npx hardhat run scripts/mint-to-any-account.js --network localhost
-```
-
-### 7.3 使用水龙头脚本
-
-```bash
-# 交互式获取
-npm run faucet
-# 然后按照提示输入钱包地址
-```
-
----
 
 ## 8. 📊 使用协议功能
 

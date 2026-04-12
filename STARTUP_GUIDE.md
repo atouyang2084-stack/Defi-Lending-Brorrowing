@@ -97,19 +97,6 @@ npm run dev
 ### 4.2 访问前端
 打开浏览器访问：**[http://localhost:5173](http://localhost:5173)**
 
-## 💰 第五步：获取测试代币
-
-### 5.1 自动获取（前20个账户）
-如果你使用Hardhat节点的前20个账户之一，部署时已经自动获得了：
-- **100,000 USDC**
-- **1 WBTC**
-- **10 ETH**（用于Gas）
-
-### 5.2 手动获取（其他账户）
-```bash
-# 在项目根目录（新终端）
-TARGET_ADDRESS=你的钱包地址 npx hardhat run scripts/mint-to-any-account.js --network localhost
-```
 
 ## 🔧 第六步：使用协议
 

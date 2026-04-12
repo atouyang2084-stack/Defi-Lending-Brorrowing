@@ -83,7 +83,6 @@ frontend/
 ```
 scripts/
 ├── copy-abi.js          # 复制ABI到前端（重要）
-├── faucet.js            # 水龙头脚本（获取测试代币）
 ├── mint-to-any-account.js # 给任意账户发币
 └── check-contracts.js   # 检查合约状态
 ```
@@ -102,7 +101,6 @@ contract-addresses.json  # 合约地址（自动生成）
 README.md               # 项目主说明文档
 STARTUP_GUIDE.md        # 详细启动指南（新）
 QUICK_START.md          # 快速开始指南
-GET_TEST_TOKENS.md      # 获取测试代币指南
 CHECKLIST.md            # 功能检查清单
 PROJECT_STRUCTURE.md    # 项目结构说明（本文档）
 SOLUTION.md             # 解决方案文档
@@ -201,8 +199,6 @@ bash cleanup-for-github.sh
 # 更新ABI
 npm run transmit
 
-# 获取测试代币
-npm run faucet
 
 # 检查合约
 npx hardhat run scripts/check-contracts.js --network localhost
