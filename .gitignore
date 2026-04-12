@@ -5,83 +5,61 @@
 # 📦 依赖包
 node_modules/
 frontend/node_modules/
-pnpm-lock.yaml
-yarn.lock
-
-# 🏗️ 构建产物
-dist/
-frontend/dist/
-artifacts/
-cache/
-build/
-out/
-typechain-types/
 
 # 🔧 开发环境
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+
+# 🏗️ 构建产物
+artifacts/
+cache/
+typechain/
+frontend/dist/
+
+# 📊 日志文件
+*.log
 
 # 💻 IDE和编辑器
 .vscode/
 .idea/
-*.swp
-*.swo
-*.sublime-*
 
 # 🖥️ 操作系统
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-desktop.ini
-
-# 📊 日志文件
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# 📁 临时文件
-tmp/
-temp/
-*.tmp
-*.temp
-
-# 📈 测试覆盖率
-coverage/
-.nyc_output/
-*.lcov
-
-# 🔨 构建工具
-.vite/
-*.tsbuildinfo
 
 # 🎯 项目特定忽略
-# 调试文件（各种debug-*.js, test.html等）
-frontend/public/test.html
-frontend/public/simple-test.html
-frontend/public/test-repay.html
-scripts/debug-*.js
-scripts/analyze-*.js
-scripts/diagnose-*.js
+# 调试脚本（不上传）
 check-*.js
 debug-*.js
 complete-test.js
 quick-test.js
-contracts/test/debug.test.js
-contracts/test/simple.test.js
-contracts/test/test-deposit.js
-contracts/test/LendingPool-fixed.test.js
+test-*.js
+scripts/analyze-*.js
+scripts/debug-*.js
+scripts/diagnose-*.js
 
-# 但保留这些核心脚本：
-!scripts/copy-abi.js
-!scripts/faucet.js
-!scripts/mint-to-any-account.js
-!scripts/check-contracts.js
+# 清理脚本（不上传）
+cleanup-for-github.*
+
+# 临时文档（不上传）
+CHECKLIST.md
+FIX_METAMASK_ISSUE.md
+GET_TEST_TOKENS.md
+SOLUTION.md
+FINAL_SOLUTION.md
+
+# 测试文件（不上传）
+frontend/public/simple-test.html
+frontend/public/test-repay.html
+frontend/public/test.html
+
+# 但保留这些核心文件：
+!contracts/test/           # 保留测试目录
+!contracts/test/mocks/     # 保留mock合约
+!contracts/test/LendingPool.test.js  # 保留主测试文件
+!scripts/copy-abi.js       # 保留ABI复制脚本
+!scripts/faucet.js         # 保留水龙头脚本
+!scripts/mint-to-any-account.js  # 保留发币脚本
+!scripts/check-contracts.js # 保留合约检查脚本
+
+
