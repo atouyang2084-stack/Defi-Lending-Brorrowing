@@ -63,27 +63,6 @@ coverage/
 .vite/
 *.tsbuildinfo
 
-# 🐳 Docker
-docker-compose.override.yml
-
-# 📝 文档生成
-docs/_build/
-
-# 🎨 设计文件
-*.sketch
-*.fig
-*.xd
-
-# 🔒 密钥和证书
-*.pem
-*.key
-*.crt
-*.csr
-
-# 📊 数据文件
-*.sqlite
-*.db
-
 # 🎯 项目特定忽略
 # 调试文件（各种debug-*.js, test.html等）
 frontend/public/test.html
@@ -106,8 +85,3 @@ contracts/test/LendingPool-fixed.test.js
 !scripts/faucet.js
 !scripts/mint-to-any-account.js
 !scripts/check-contracts.js
-GET_TEST_TOKENS.md
-CHECKLIST.md
-FIX_METAMASK_ISSUE.md
-SOLUTION.md
-FINAL_SOLUTION.md

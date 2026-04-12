@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        button {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>前端功能测试</h1>
+
+    <div class="test-section">
+        <h2>1. JavaScript控制台测试</h2>
+        <button onclick="testConsole()">测试控制台输出</button>
+        <div id="console-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 页面加载状态</h2>
+        <div id="page-status">
+            <p>检查中...</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 常见问题排查</h2>
+        <h3>如果前端没有反应：</h3>
+        <ol>
+            <li>按 <strong>F12</strong> 打开开发者工具</li>
+            <li>查看 <strong>控制台(Console)</strong> 标签页</li>
+            <li>查看 <strong>网络(Network)</strong> 标签页</li>
+            <li>检查是否有红色错误信息</li>
+            <li>刷新页面查看错误</li>
+        </ol>
+
+        <h3>检查步骤：</h3>
+        <pre id="check-steps">
+1. 检查Hardhat节点是否运行: npx hardhat node
+2. 检查合约是否部署: npx hardhat run contracts/script/deploy.js --network localhost
+3. 检查测试账户: npx hardhat run scripts/setup-test-account-fixed.js --network localhost
+4. 检查前端服务器: cd frontend && npm run dev
+5. 访问: http://localhost:5174
+        </pre>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Repay问题特别说明</h2>
+        <p><strong>重要:</strong> <code>InsufficientLiquidity()</code> 错误 <span class="error">不可能</span> 来自repay函数！</p>
+        <p>这个错误只会在 <strong>borrow</strong> 函数中发生。</p>
+        <p>如果repay时看到这个错误，说明：</p>
+        <ul>
+            <li>前端调用了错误的函数（调用了borrow而不是repay）</li>
+            <li>或者用户实际上在尝试借款而不是还款</li>
+        </ul>
+    </div>
+
+    <script>
+        function testConsole() {
+            console.log('=== 控制台测试开始 ===');
+            console.log('时间:', new Date().toLocaleString());
+            console.log('浏览器:', navigator.userAgent);
+            console.log('页面URL:', window.location.href);
+            console.log('=== 控制台测试结束 ===');
+
+            document.getElementById('console-result').innerHTML =
+                '<p class="success">✅ 控制台测试完成，请按F12查看控制台输出</p>';
+        }
+
+        // 检查页面加载状态
+        window.addEventListener('load', function() {
+            const statusDiv = document.getElementById('page-status');
+            statusDiv.innerHTML = `
+                <p class="success">✅ 页面加载完成</p>
+                <p>URL: ${window.location.href}</p>
+                <p>标题: ${document.title}</p>
+                <p>脚本数量: ${document.scripts.length}</p>
+            `;
+        });
+
+        // 检查JavaScript错误
+        window.addEventListener('error', function(e) {
+            console.error('页面JavaScript错误:', e);
+            const statusDiv = document.getElementById('page-status');
+            statusDiv.innerHTML += `
+                <p class="error">❌ JavaScript错误: ${e.message}</p>
+                <p>文件: ${e.filename}</p>
+                <p>行号: ${e.lineno}</p>
+            `;
+        });
+    </script>
+</body>
+</html>
