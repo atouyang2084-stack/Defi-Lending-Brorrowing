@@ -1,5 +1,4 @@
-import React from 'react';
-import { HEALTH_FACTOR_LIQUIDATION_THRESHOLD, RAY } from '../protocol/constants';
+import { RAY } from '../protocol/constants';
 import { formatHealthFactor } from '../utils/format';
 
 interface HealthFactorBadgeProps {

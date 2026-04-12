@@ -1,38 +1,113 @@
-# macOS
-.DS_Store
+# ============================================
+# DeFi借贷协议 - Git忽略规则
+# ============================================
 
-# env
-.env
-.env.*
-
-# Node
+# 📦 依赖包
 node_modules/
+frontend/node_modules/
+pnpm-lock.yaml
+yarn.lock
+
+# 🏗️ 构建产物
 dist/
-build/
-
-# Foundry
-cache/
-out/
-
-# Hardhat
+frontend/dist/
 artifacts/
-cache_hardhat/
+cache/
+build/
+out/
+typechain-types/
 
-# Logs
-*.log
+# 🔧 开发环境
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# IDE
+# 💻 IDE和编辑器
 .vscode/
 .idea/
-EOF && git add . && git commit --trailer "Made-with: Cursor" -m 'chore: initialize DeFi lending project scaffold' && git branch -M main && (git remote remove origin || true) && git remote add origin "https://github.com/atouyang2084-stack/Defi-Lending-Brorrowing.git" && git push -u origin main
-node_modules
-.env
-coverage
-coverage.json
-typechain
-typechain-types
+*.swp
+*.swo
+*.sublime-*
 
-# Hardhat files
-cache
-artifacts
-contracts/contract-addresses.json
+# 🖥️ 操作系统
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# 📊 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# 📁 临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 📈 测试覆盖率
+coverage/
+.nyc_output/
+*.lcov
+
+# 🔨 构建工具
+.vite/
+*.tsbuildinfo
+
+# 🐳 Docker
+docker-compose.override.yml
+
+# 📝 文档生成
+docs/_build/
+
+# 🎨 设计文件
+*.sketch
+*.fig
+*.xd
+
+# 🔒 密钥和证书
+*.pem
+*.key
+*.crt
+*.csr
+
+# 📊 数据文件
+*.sqlite
+*.db
+
+# 🎯 项目特定忽略
+# 调试文件（各种debug-*.js, test.html等）
+frontend/public/test.html
+frontend/public/simple-test.html
+frontend/public/test-repay.html
+scripts/debug-*.js
+scripts/analyze-*.js
+scripts/diagnose-*.js
+check-*.js
+debug-*.js
+complete-test.js
+quick-test.js
+contracts/test/debug.test.js
+contracts/test/simple.test.js
+contracts/test/test-deposit.js
+contracts/test/LendingPool-fixed.test.js
+
+# 但保留这些核心脚本：
+!scripts/copy-abi.js
+!scripts/faucet.js
+!scripts/mint-to-any-account.js
+!scripts/check-contracts.js
+GET_TEST_TOKENS.md
+CHECKLIST.md
+FIX_METAMASK_ISSUE.md
+SOLUTION.md
+FINAL_SOLUTION.md

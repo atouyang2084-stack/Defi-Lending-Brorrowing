@@ -1,64 +1,59 @@
-import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ADDRESSES } from '../web3/addresses';
 import lendingPoolABI from '../web3/abis/LendingPool.json';
-import erc20ABI from '../web3/abis/ERC20.json';
 import type {DepositParams} from '../web3/types';
 
 /**
  * 存款Hook
  */
 export function useDeposit() {
-    const { address } = useAccount();
-    const { data: hash, writeContract, isPending, error } = useWriteContract();
+    const { data: hash, writeContract, isPending, error, reset } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
-
-    /**
-     * 检查代币授权额度
-     */
-    function useAllowance(tokenAddress: `0x${string}`) {
-        return useReadContract({
-            address: tokenAddress,
-            abi: erc20ABI,
-            functionName: 'allowance',
-            args: [address as `0x${string}`, ADDRESSES.LENDING_POOL],
-            query: {
-                enabled: !!address,
-            },
-        });
-    }
-
-    /**
-     * 授权代币
-     */
-    function approve(tokenAddress: `0x${string}`, amount: bigint) {
-        writeContract({
-            address: tokenAddress,
-            abi: erc20ABI,
-            functionName: 'approve',
-            args: [ADDRESSES.LENDING_POOL, amount],
-        });
-    }
 
     /**
      * 执行存款
      */
     function deposit(params: DepositParams) {
-        writeContract({
-            address: ADDRESSES.LENDING_POOL,
-            abi: lendingPoolABI,
-            functionName: 'deposit',
-            args: [params],
+        console.log('=== useDeposit.deposit开始 ===');
+        console.log('参数:', {
+            asset: params.asset,
+            amount: params.amount.toString(),
+            onBehalfOf: params.onBehalfOf,
+            amountHex: '0x' + params.amount.toString(16)
         });
+        console.log('LENDING_POOL地址:', ADDRESSES.LENDING_POOL);
+        console.log('writeContract函数状态:', {
+            isPending,
+            error: error?.message
+        });
+
+        try {
+            const result = writeContract({
+                address: ADDRESSES.LENDING_POOL,
+                abi: lendingPoolABI,
+                functionName: 'deposit',
+                args: [params],
+            });
+            console.log('writeContract调用返回:', result);
+            console.log('✅ writeContract调用成功，等待MetaMask确认...');
+        } catch (error: any) {
+            console.error('❌ writeContract调用失败:', error);
+            console.error('错误名称:', error.name);
+            console.error('错误消息:', error.message);
+            console.error('错误堆栈:', error.stack);
+
+            // 显示给用户
+            alert(`存款调用失败: ${error.message}\n\n请检查:\n1. 钱包是否已连接\n2. 网络是否正确\n3. 浏览器控制台查看详细错误`);
+        }
     }
 
     return {
         deposit,
-        approve,
-        useAllowance,
         isPending,
         isConfirming,
         isSuccess,
         error,
         hash,
+        reset,
     };
 }

@@ -1,13 +1,14 @@
 import { useAccount } from 'wagmi';
-import { useAccountData, useAssetConfig, useAssetRates, useDeposit, useAllowance } from '../hooks';
+import { useAccountData, useAssetConfig, useAssetRates } from '../hooks';
 import { ADDRESSES } from '../web3/addresses';
 import { formatAmount, formatPercentage, formatAPY } from '../utils/format';
 import HealthFactorBadge from '../components/HealthFactorBadge';
 import ConnectButton from '../components/ConnectButton';
+import Faucet from '../components/Faucet';
 
 export default function Dashboard() {
     const { address, isConnected } = useAccount();
-    const { data: accountData, isLoading: isAccountLoading } = useAccountData();
+    const { data: accountData, isLoading: isAccountLoading, error } = useAccountData();
     const { data: usdcConfig } = useAssetConfig(ADDRESSES.USDC);
     const { data: wbtcConfig } = useAssetConfig(ADDRESSES.WBTC);
     const usdcRates = useAssetRates(ADDRESSES.USDC);
@@ -36,6 +37,18 @@ export default function Dashboard() {
                 <ConnectButton />
             </div>
 
+            {/* 水龙头 - 获取测试代币 */}
+            <Faucet />
+
+            {/* 调试信息 */}
+            {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                    <h3 className="text-red-800 dark:text-red-300 font-semibold mb-2">错误信息</h3>
+                    <p className="text-red-700 dark:text-red-400 text-sm">{error.message}</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs mt-2">地址: {address || '未连接'}</p>
+                </div>
+            )}
+
             {/* 健康因子卡片 */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -49,10 +62,20 @@ export default function Dashboard() {
                         <div className="text-right text-sm text-gray-600 dark:text-gray-400">
                             <div>Collateral Value: ${formatAmount(accountData.collateralValueUsdWad, 18, 2)}</div>
                             <div>Debt Value: ${formatAmount(accountData.debtValueUsdWad, 18, 2)}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                抵押品: {accountData.collateralValueUsdWad.toString()} | 债务: {accountData.debtValueUsdWad.toString()}
+                            </div>
                         </div>
                     </div>
                 ) : (
-                    <p className="text-gray-500 dark:text-gray-400">No account data available</p>
+                    <div className="space-y-2">
+                        <p className="text-gray-500 dark:text-gray-400">No account data available</p>
+                        {address && (
+                            <p className="text-gray-400 dark:text-gray-500 text-sm">
+                                已连接地址: {address.substring(0, 6)}...{address.substring(address.length - 4)}
+                            </p>
+                        )}
+                    </div>
                 )}
             </div>
 
@@ -91,19 +114,19 @@ export default function Dashboard() {
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400">Supply APY</span>
                                     <span className="font-semibold text-green-600 dark:text-green-400">
-                                        {usdcRates.supplyRate ? formatAPY(usdcRates.supplyRate) : '0.00%'}
+                                        {usdcRates.supplyRate ? formatAPY(usdcRates.supplyRate as bigint) : '0.00%'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400">Borrow APY</span>
                                     <span className="font-semibold text-red-600 dark:text-red-400">
-                                        {usdcRates.borrowRate ? formatAPY(usdcRates.borrowRate) : '0.00%'}
+                                        {usdcRates.borrowRate ? formatAPY(usdcRates.borrowRate as bigint) : '0.00%'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400">Utilization</span>
                                     <span className="font-semibold text-gray-900 dark:text-white">
-                                        {usdcRates.utilization ? formatPercentage(usdcRates.utilization) : '0.00%'}
+                                        {usdcRates.utilization ? formatPercentage(usdcRates.utilization as bigint) : '0.00%'}
                                     </span>
                                 </div>
                             </div>
@@ -144,19 +167,19 @@ export default function Dashboard() {
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400">Supply APY</span>
                                     <span className="font-semibold text-green-600 dark:text-green-400">
-                                        {wbtcRates.supplyRate ? formatAPY(wbtcRates.supplyRate) : '0.00%'}
+                                        {wbtcRates.supplyRate ? formatAPY(wbtcRates.supplyRate as bigint) : '0.00%'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400">Borrow APY</span>
                                     <span className="font-semibold text-red-600 dark:text-red-400">
-                                        {wbtcRates.borrowRate ? formatAPY(wbtcRates.borrowRate) : '0.00%'}
+                                        {wbtcRates.borrowRate ? formatAPY(wbtcRates.borrowRate as bigint) : '0.00%'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600 dark:text-gray-400">Utilization</span>
                                     <span className="font-semibold text-gray-900 dark:text-white">
-                                        {wbtcRates.utilization ? formatPercentage(wbtcRates.utilization) : '0.00%'}
+                                        {wbtcRates.utilization ? formatPercentage(wbtcRates.utilization as bigint) : '0.00%'}
                                     </span>
                                 </div>
                             </div>

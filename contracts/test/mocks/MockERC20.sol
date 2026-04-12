@@ -28,7 +28,11 @@ contract MockERC20 {
     }
 
     function transferFrom(address from, address to, uint256 amount) external returns (bool) {
-        allowance[from][msg.sender] -= amount;
+        uint256 currentAllowance = allowance[from][msg.sender];
+        if (currentAllowance < amount) {
+            return false; // 授权不足
+        }
+        allowance[from][msg.sender] = currentAllowance - amount;
         balanceOf[from] -= amount;
         balanceOf[to] += amount;
         return true;

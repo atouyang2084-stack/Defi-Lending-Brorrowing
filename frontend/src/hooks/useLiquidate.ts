@@ -1,7 +1,6 @@
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { ADDRESSES } from '../web3/addresses';
 import lendingPoolABI from '../web3/abis/LendingPool.json';
-import erc20ABI from '../web3/abis/ERC20.json';
 import type { Address } from 'viem';
 
 export interface LiquidateParams {
@@ -15,7 +14,6 @@ export interface LiquidateParams {
  * 清算Hook
  */
 export function useLiquidate() {
-    const { address } = useAccount();
     const { data: hash, writeContract, isPending, error } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 

@@ -20,14 +20,14 @@ export function useAssetConfig(assetAddress: `0x${string}`) {
 
     const config: AssetConfig | undefined = data
         ? {
-              asset: data.asset as `0x${string}`,
-              priceFeed: data.priceFeed as `0x${string}`,
-              decimals: data.decimals,
-              ltvBps: data.ltvBps,
-              liquidationThresholdBps: data.liquidationThresholdBps,
-              liquidationBonusBps: data.liquidationBonusBps,
-              reserveFactorBps: data.reserveFactorBps,
-              isActive: data.isActive,
+              asset: (data as any).asset as `0x${string}`,
+              priceFeed: (data as any).priceFeed as `0x${string}`,
+              decimals: (data as any).decimals,
+              ltvBps: (data as any).ltvBps,
+              liquidationThresholdBps: (data as any).liquidationThresholdBps,
+              liquidationBonusBps: (data as any).liquidationBonusBps,
+              reserveFactorBps: (data as any).reserveFactorBps,
+              isActive: (data as any).isActive,
           }
         : undefined;
 
@@ -50,12 +50,12 @@ export function useReserveData(assetAddress: `0x${string}`) {
 
     const reserveData: ReserveData | undefined = data
         ? {
-              borrowIndex: data.borrowIndex,
-              supplyIndex: data.supplyIndex,
-              lastUpdatedBlock: data.lastUpdatedBlock,
-              totalBorrowScaled: data.totalBorrowScaled,
-              totalSupplyScaled: data.totalSupplyScaled,
-              protocolReserves: data.protocolReserves,
+              borrowIndex: (data as any).borrowIndex,
+              supplyIndex: (data as any).supplyIndex,
+              lastUpdatedBlock: (data as any).lastUpdatedBlock,
+              totalBorrowScaled: (data as any).totalBorrowScaled,
+              totalSupplyScaled: (data as any).totalSupplyScaled,
+              protocolReserves: (data as any).protocolReserves,
           }
         : undefined;
 
@@ -132,12 +132,12 @@ export function useTokenInfo(assetAddress: `0x${string}`) {
     const tokenInfo: TokenInfo | undefined = config.data && reserveData.data
         ? {
               address: assetAddress,
-              symbol: Object.values(SUPPORTED_TOKENS).find(t => 
-                  t.name === 'USDC' || t.name === 'Wrapped Bitcoin'
+              symbol: Object.values(SUPPORTED_TOKENS).find(t =>
+                  t.name === 'USD Coin' || t.name === 'Wrapped Bitcoin'
               )?.symbol || 'Unknown',
               name: config.data.isActive 
-                  ? (Object.values(SUPPORTED_TOKENS).find(t => 
-                      t.decimals === config.data.decimals
+                  ? (Object.values(SUPPORTED_TOKENS).find(t =>
+                      t.decimals === config.data?.decimals
                   )?.name || 'Unknown')
                   : 'Inactive',
               decimals: config.data.decimals,

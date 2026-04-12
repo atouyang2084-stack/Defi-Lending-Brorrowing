@@ -8,9 +8,11 @@
   },
   "scripts": {
     "startnode": "npx hardhat node",
-    "startnetwork":"npx hardhat run contracts/script/deploy.js --network localhost",
+    "startnetwork": "npx hardhat run contracts/script/deploy.js --network localhost",
     "transmit": "node scripts/copy-abi.js",
-    "compile": "npx hardhat compile"
+    "compile": "npx hardhat compile",
+    "faucet": "node scripts/faucet.js",
+    "get-tokens": "node scripts/faucet.js"
   },
   "repository": {
     "type": "git",

@@ -24,10 +24,10 @@ export function useAccountData(address?: `0x${string}`) {
 
     const accountData: UserAccountData | undefined = data
         ? {
-              collateralValueUsdWad: data[0],
-              debtValueUsdWad: data[1],
-              weightedCollateralForHFUsdWad: data[2],
-              currentHealthFactorRay: data[3],
+              collateralValueUsdWad: (data as [bigint, bigint, bigint, bigint])[0],
+              debtValueUsdWad: (data as [bigint, bigint, bigint, bigint])[1],
+              weightedCollateralForHFUsdWad: (data as [bigint, bigint, bigint, bigint])[2],
+              currentHealthFactorRay: (data as [bigint, bigint, bigint, bigint])[3],
           }
         : undefined;
 

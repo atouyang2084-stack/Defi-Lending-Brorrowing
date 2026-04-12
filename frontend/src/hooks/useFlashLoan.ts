@@ -1,4 +1,4 @@
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ADDRESSES } from '../web3/addresses';
 import lendingPoolABI from '../web3/abis/LendingPool.json';
 import type { FlashLoanParams } from '../web3/types';
@@ -7,7 +7,6 @@ import type { FlashLoanParams } from '../web3/types';
  * 闪电贷Hook
  */
 export function useFlashLoan() {
-    const { address } = useAccount();
     const { data: hash, writeContract, isPending, error } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 

@@ -1,4 +1,4 @@
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ADDRESSES } from '../web3/addresses';
 import lendingPoolABI from '../web3/abis/LendingPool.json';
 import type { BorrowParams } from '../web3/types';
@@ -7,8 +7,7 @@ import type { BorrowParams } from '../web3/types';
  * 借款Hook
  */
 export function useBorrow() {
-    const { address } = useAccount();
-    const { data: hash, writeContract, isPending, error } = useWriteContract();
+    const { data: hash, writeContract, isPending, error, reset } = useWriteContract();
     const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
     /**
@@ -30,5 +29,6 @@ export function useBorrow() {
         isSuccess,
         error,
         hash,
+        reset,
     };
 }
