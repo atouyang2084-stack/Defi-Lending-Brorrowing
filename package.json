@@ -10,7 +10,7 @@
     "startnode": "npx hardhat node",
     "startnetwork": "npx hardhat run contracts/script/deploy.js --network localhost",
     "transmit": "node scripts/copy-abi.js",
-    "compile": "npx hardhat compile",
+    "compile": "npx hardhat compile"
   },
   "repository": {
     "type": "git",

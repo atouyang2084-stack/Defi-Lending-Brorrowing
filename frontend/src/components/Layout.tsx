@@ -5,8 +5,8 @@ const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/reserve/usdc", label: "USDC Market" },
     { to: "/reserve/wbtc", label: "WBTC Market" },
+    { to: "/liquidation", label: "Liquidation" },
     // { to: "/position", label: "Position" },
-    // { to: "/liquidation", label: "Liquidation" },
     // { to: "/flashloan", label: "Flash Loan" },
 ];
 

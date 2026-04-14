@@ -29,6 +29,7 @@ export default function Reserve() {
     const borrow = useBorrow();
     const repay = useRepay();
     const allowance = useAllowance(ADDRESSES[asset?.toUpperCase() as keyof typeof ADDRESSES] as `0x${string}`);
+    const allowanceValue = typeof allowance.allowance === 'bigint' ? allowance.allowance : 0n;
     // repay使用同一个授权实例，因为授权是针对LendingPool的
 
     // 获取用户余额（添加refetch函数）
@@ -152,7 +153,7 @@ export default function Reserve() {
 
                     alert(
                         `授权成功，但授权额度仍然不足。\n\n` +
-                        `当前授权: ${formatAmount(allowance.allowance || 0n, config.decimals, 2)} ${asset?.toUpperCase()}\n` +
+                        `当前授权: ${formatAmount(allowanceValue, config.decimals, 2)} ${asset?.toUpperCase()}\n` +
                         `需要授权: ${formatAmount(amountBigInt, config.decimals, 2)} ${asset?.toUpperCase()}\n\n` +
                         `请等待数据刷新或手动点击还款按钮。`
                     );
@@ -319,9 +320,8 @@ export default function Reserve() {
             isConfirming: allowance.isConfirming,
             isSuccess: allowance.isSuccess,
             error: allowance.error,
-            hash: allowance.hash
         });
-    }, [allowance.allowance, allowance.isLoading, allowance.isPending, allowance.isConfirming, allowance.isSuccess, allowance.error, allowance.hash]);
+    }, [allowance.allowance, allowance.isLoading, allowance.isPending, allowance.isConfirming, allowance.isSuccess, allowance.error]);
 
     // 监听还款状态变化
     useEffect(() => {
@@ -390,7 +390,7 @@ export default function Reserve() {
                         // 显示授权提示，推荐最大值
                         const authChoice = confirm(
                             `存款需要授权 ${asset?.toUpperCase()} 给合约。\n\n` +
-                            `当前授权: ${formatAmount(allowance.allowance || 0n, config.decimals, 2)} ${asset?.toUpperCase()}\n` +
+                            `当前授权: ${formatAmount(allowanceValue, config.decimals, 2)} ${asset?.toUpperCase()}\n` +
                             `本次存款: ${formatAmount(amountBigInt, config.decimals, 2)} ${asset?.toUpperCase()}\n\n` +
                             `💡 建议: 授权最大值（一次授权，多次使用）\n\n` +
                             `点击"确定"授权最大值，点击"取消"仅授权本次存款金额。`
@@ -498,7 +498,7 @@ export default function Reserve() {
                     // 显示授权提示，默认推荐最大值授权
                     const authChoice = confirm(
                         `还款需要授权 ${asset?.toUpperCase()} 给合约。\n\n` +
-                        `当前授权: ${formatAmount(allowance.allowance || 0n, config.decimals, 2)} ${asset?.toUpperCase()}\n` +
+                        `当前授权: ${formatAmount(allowanceValue, config.decimals, 2)} ${asset?.toUpperCase()}\n` +
                         `本次还款: ${formatAmount(amountBigInt, config.decimals, 2)} ${asset?.toUpperCase()}\n\n` +
                         `💡 建议: 授权最大值（一次授权，多次使用）\n\n` +
                         `点击"确定"授权最大值，点击"取消"仅授权本次还款金额。`

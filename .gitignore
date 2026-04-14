@@ -1,64 +1,63 @@
 # ============================================
-# DeFi借贷协议 - Git忽略规则
+# DeFi Lending - Git Ignore Rules
+# Keep repository clean and runnable after clone
 # ============================================
 
-# 📦 依赖包
+# Dependencies
 node_modules/
 frontend/node_modules/
 
-# 🔧 开发环境
-.env
-.env.local
-
-# 🏗️ 构建产物
+# Build outputs / generated files
 artifacts/
 cache/
 typechain/
+coverage/
 frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
 
-# 📊 日志文件
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# 💻 IDE和编辑器
-.vscode/
+# IDE / editor
 .idea/
+.vscode/
 
-# 🖥️ 操作系统
+# OS files
 .DS_Store
 Thumbs.db
 
-# 🎯 项目特定忽略
-# 调试脚本（不上传）
-check-*.js
-debug-*.js
-complete-test.js
-quick-test.js
-test-*.js
-scripts/analyze-*.js
-scripts/debug-*.js
-scripts/diagnose-*.js
+# Temporary / backup files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
 
-# 清理脚本（不上传）
+# Local AI / tool metadata
+.claude/
+
+# Project cleanup helper scripts
 cleanup-for-github.*
 
-# 临时文档（不上传）
-CHECKLIST.md
-FIX_METAMASK_ISSUE.md
-GET_TEST_TOKENS.md
-SOLUTION.md
-FINAL_SOLUTION.md
-
-# 测试文件（不上传）
+# Optional local test pages
 frontend/public/simple-test.html
 frontend/public/test-repay.html
 frontend/public/test.html
 
-# 但保留这些核心文件：
-!contracts/test/           # 保留测试目录
-!contracts/test/mocks/     # 保留mock合约
-!contracts/test/LendingPool.test.js  # 保留主测试文件
-!scripts/copy-abi.js       # 保留ABI复制脚本
-!scripts/mint-to-any-account.js  # 保留发币脚本
-!scripts/check-contracts.js # 保留合约检查脚本
+# Markdown upload policy: keep only root README + USAGE
+**/*.md
+!/README.md
+!/readme.md
+!/USAGE.md
 
 
