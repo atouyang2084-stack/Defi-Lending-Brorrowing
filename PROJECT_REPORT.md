@@ -31,6 +31,7 @@
 
 - **Kinked Model（折点模型）**：利用率在 kink 前/后使用不同斜率
 - **按区块累加（per block）**：通过指数（Index）累计利息，避免逐用户逐区块更新
+- **前端可视化**：Reserve 页面新增 Interest Rate Model 模块，实时展示 Utilization、Borrow APR、Supply APR、Kink 位置与利率曲线
 
 ### 2.4 预言机与清算
 
@@ -75,6 +76,11 @@
   - 资产数量与 USD 价值之间的转换
   - LTV 上限计算
   - Health Factor 计算（以 RAY 表示）
+
+- **Frontend InterestCurve（前端利率模型展示）**
+  - 在 Reserve 页面渲染 Borrow/Supply APR 曲线
+  - 按合约同构公式计算 kink 前后利率分段
+  - 使用链上实时数据（`getUtilization` / `getBorrowRatePerBlock` / `getSupplyRatePerBlock`）展示当前状态点
 
 ## 4. 核心算法与数据结构
 
@@ -233,6 +239,23 @@ HF = \\frac{WeightedCollateral}{Debt}
 - 启动本地链（Hardhat node）
 - 部署合约并同步 ABI 到前端
 - 前端页面演示：存款、借款、还款、降价触发清算、清算执行
+
+### 7.3 前端 Interest Rate Model 验证
+
+- 页面位置：Reserve 市场页
+- 可见信息：
+  - 实时 Utilization
+  - 实时 Borrow/Supply APR
+  - Kink 垂直分界线
+  - Borrow/Supply 两条利率曲线与当前利用率位置点
+- 数据来源：
+  - `getUtilization(asset)`
+  - `getBorrowRatePerBlock(asset)`
+  - `getSupplyRatePerBlock(asset)`
+  - 资产 `reserveFactorBps`
+- 参数说明：
+  - 前端默认使用与部署脚本一致的 kink 参数（`baseRatePerYearRay/slope1PerYearRay/slope2PerYearRay/kinkWad/blocksPerYear`）
+  - 若后续合约开放读取 `KinkModelParams` 的 view 接口，可无缝改为完全链上参数驱动
 
 ## 8. 可扩展性规划
 
