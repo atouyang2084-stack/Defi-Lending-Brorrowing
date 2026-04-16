@@ -7,9 +7,11 @@ import { ADDRESSES } from '../web3/addresses';
 import erc20ABI from '../web3/abis/ERC20.json';
 import lendingPoolABI from '../web3/abis/LendingPool.json';
 import { formatAmount, formatPercentage, formatAPY } from '../utils/format';
+import { INTEREST_MODEL_BY_ASSET } from '../protocol/constants';
 import AmountInput from '../components/AmountInput';
 import TxButton from '../components/TxButton';
 import ConnectButton from '../components/ConnectButton';
+import InterestCurve from '../components/InterestCurve';
 
 type Action = 'deposit' | 'withdraw' | 'borrow' | 'repay';
 
@@ -363,6 +365,9 @@ export default function Reserve() {
         return <div className="text-center py-8">Asset not found</div>;
     }
 
+    const assetKey = asset?.toUpperCase() as keyof typeof INTEREST_MODEL_BY_ASSET;
+    const interestModel = INTEREST_MODEL_BY_ASSET[assetKey] ?? INTEREST_MODEL_BY_ASSET.USDC;
+
     const handleAction = () => {
         if (!amount || !address) return;
 
@@ -639,6 +644,14 @@ export default function Reserve() {
                     </div>
                 </div>
             </div>
+
+            <InterestCurve
+                model={interestModel}
+                reserveFactorBps={config.reserveFactorBps}
+                utilizationWad={rates.utilization as bigint | undefined}
+                borrowRatePerBlockRay={rates.borrowRate as bigint | undefined}
+                supplyRatePerBlockRay={rates.supplyRate as bigint | undefined}
+            />
 
             {/* 用户余额信息 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

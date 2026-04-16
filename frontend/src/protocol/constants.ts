@@ -50,3 +50,18 @@ export const DEFAULT_LIQUIDATION_BONUS_BPS = {
 
 // 默认储备因子（基点）
 export const DEFAULT_RESERVE_FACTOR_BPS = 1000; // 10%
+
+// 默认利率模型参数（Kinked model）
+export const DEFAULT_INTEREST_MODEL_PARAMS = {
+    baseRatePerYearRay: 0n,
+    slope1PerYearRay: 40000000000000000000000000n, // 0.04 * 1e27
+    slope2PerYearRay: 1000000000000000000000000000n, // 1.00 * 1e27
+    kinkWad: 800000000000000000n, // 0.8 * 1e18
+    blocksPerYear: BLOCKS_PER_YEAR,
+} as const;
+
+// 按资产映射，便于后续单独配置不同模型
+export const INTEREST_MODEL_BY_ASSET = {
+    USDC: DEFAULT_INTEREST_MODEL_PARAMS,
+    WBTC: DEFAULT_INTEREST_MODEL_PARAMS,
+} as const;

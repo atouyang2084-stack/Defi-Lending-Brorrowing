@@ -54,6 +54,42 @@ frontend/public/simple-test.html
 frontend/public/test-repay.html
 frontend/public/test.html
 
+# Root-level temporary test/debug scripts
+/check-*.js
+/debug-*.js
+/diagnose-*.js
+/test-*.js
+/quick-*.js
+/complete-test.js
+/add-liquidity.js
+/calculate-liquidation.js
+/direct-liquidation.js
+/final-setup.js
+/final-test-liquidation.js
+/fix-price-script.js
+/force-update-oracle.js
+/fresh-setup.js
+/setup-for-liquidation.js
+
+# scripts/ temporary test/debug helpers
+/scripts/analyze-*.js
+/scripts/check-*.js
+/scripts/debug-*.js
+/scripts/diagnose-*.js
+/scripts/test-*.js
+/scripts/reproduce-*.js
+/scripts/setup-test-account*.js
+/scripts/find-min-deposit.js
+/scripts/manual-approve.js
+/scripts/send-eth.js
+/scripts/demo-repay-with-approval.js
+
+# Keep essential scripts for normal usage/demo
+!/scripts/copy-abi.js
+!/scripts/simulate-price-drop.js
+!/scripts/restore-price.js
+!/scripts/mint-to-any-account.js
+
 # Markdown upload policy: keep only root README + USAGE
 **/*.md
 !/README.md
